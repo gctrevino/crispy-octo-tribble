@@ -19,9 +19,25 @@ should run on a regular schedule.
 To generate an automatic procedure with the specified requirements, I created a couple of GitHub
 Actions that work over the repository.
 
-**create_release_branch** that generates a release branch on schedule, but it can also be triggered manually
-**publish_release** that after the release branch gets generated, create a release for the new release branch
+**[create_release_branch](https://github.com/gctrevino/crispy-octo-tribble/actions/workflows/create_release_branch.yml)** that generates a release branch on schedule, but it can also be triggered manually
+
+**[publish_release](https://github.com/gctrevino/crispy-octo-tribble/actions/workflows/publish_release.yml)** that after the release branch gets generated, create a release for the new release branch
+
+### To run it
+---
+The quickest way to make this run is by manually triggering the action [create_release_branch](https://github.com/gctrevino/crispy-octo-tribble/actions/workflows/create_release_branch.yml)
+
+Alternatively, the schedule can be modified to make it run automatically as needed.
+
+```
+  schedule:
+    - cron: '30 5 11 * *'
+    - cron: '30 5 21 * *'
+```
+
+### Alternatives
+---
+There are other premade solutions that automagically gather the release notes based on the comments such as [semantic-release](https://semantic-release.gitbook.io/semantic-release/) but that would require a commitment from the developers to respect such standards or implement a prehook solution such as (husky)[https://typicode.github.io/husky] to enforce them.
 
 
-https://semantic-release.gitbook.io/semantic-release/
 
