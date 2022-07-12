@@ -62,28 +62,37 @@ jobs:
 #              sha: annotatedTag.data.sha
 #            })
 
-      - name: Create Release Branch
-        id: create_release_branch
+      - name: Test token
         uses: actions/github-script@v4
         with:
+          github-token: ${{ secrets.TMP_TOKEN }}
           script: |
-            console.log('hellow world')
-            # https://docs.github.com/en/rest/git/refs#create-a-reference
-            #const url_releases='POST /repos/'+context.repo.owner+'/'+context.repo.repo+'/git/refs'
-            #console.log('URL ['+url_releases+']')
-            #console.log('owner ['+context.repo.owner+']')
-            #console.log('repo ['+context.repo.repo+']')
-            #console.log('ref ['+'refs/heads/release/${{ env.NEW_TAG }}'+']')
-            #console.log('sha ['+context.sha+']')
+            console.log('Hello world')
 
-            #try {
-            #  release_branch = await github.request(url_releases, {
-            #    owner: context.repo.owner,
-            #    repo: context.repo.repo,
-            #    ref: 'refs/heads/release/${{ env.NEW_TAG }}',
-            #    sha: context.sha
-            #  })
-            #} catch (error) {
-            #  console.error(error);
-            #}
-
+#      - name: Create Release Branch
+#        id: create_release_branch
+#        uses: actions/github-script@v4
+#        with:
+#          github-token: ${{ secrets.TMP_TOKEN }}
+#          script: |
+#            console.log('hellow world')
+#            # https://docs.github.com/en/rest/git/refs#create-a-reference
+#            #const url_releases='POST /repos/'+context.repo.owner+'/'+context.repo.repo+'/git/refs'
+#            #console.log('URL ['+url_releases+']')
+#            #console.log('owner ['+context.repo.owner+']')
+#            #console.log('repo ['+context.repo.repo+']')
+#            #console.log('ref ['+'refs/heads/release/${{ env.NEW_TAG }}'+']')
+#            #console.log('sha ['+context.sha+']')
+#
+#            #try {
+#            #  release_branch = await github.request(url_releases, {
+#            #    owner: context.repo.owner,
+#            #    repo: context.repo.repo,
+#            #    ref: 'refs/heads/release/${{ env.NEW_TAG }}',
+#            #    sha: context.sha
+#            #  })
+#            #} catch (error) {
+#            #  console.error(error);
+#            #}
+#
+#
