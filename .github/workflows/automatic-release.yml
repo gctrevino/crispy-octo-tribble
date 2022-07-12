@@ -75,37 +75,39 @@ jobs:
 #              sha: annotatedTag.data.sha
 #            })
 
-      - name: Create Release
-        id: create_release
+      - name: Create Release Branch
+        id: create_release_branch
         uses: actions/github-script@v4
         with:
           github-token: ${{secrets.TMP_TOKEN}}
           script: |
             const url_releases='POST /repos/'+context.repo.owner+'/'+context.repo.repo+'/git/refs'
-            await github.request('POST /repos/{owner}/{repo}/git/refs', {
+            release_branch = await github.request('POST /repos/{owner}/{repo}/git/refs', {
               owner: context.repo.owner,
               repo: context.repo.repo,
               ref: 'refs/heads/release/${{ env.NEW_TAG }}',
               sha: context.repo.sha
             })
 
-      - name: Create Release
-        id: create_release
-        uses: actions/github-script@v4
-        with:
-          github-token: ${{secrets.TMP_TOKEN}}
-          script: |
-            # https://docs.github.com/en/rest/releases/releases#create-a-release
-            const url_releases='POST /repos/'+context.repo.owner+'/'+context.repo.repo+'/releases'
-            await github.request(url_releases, {
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              tag_name: 'v${{ env.NEW_TAG }}',
-              target_commitish: 'main',
-              name: 'v${{ env.NEW_TAG }}',
-              body: 'Description of the release',
-              draft: false,
-              prerelease: false,
-              generate_release_notes: false
-            })
+            console.log(release_branch)
 
+#      - name: Create Release
+#        id: create_release
+#        uses: actions/github-script@v4
+#        with:
+#          github-token: ${{secrets.TMP_TOKEN}}
+#          script: |
+#            # https://docs.github.com/en/rest/releases/releases#create-a-release
+#            const url_releases='POST /repos/'+context.repo.owner+'/'+context.repo.repo+'/releases'
+#            await github.request(url_releases, {
+#              owner: context.repo.owner,
+#              repo: context.repo.repo,
+#              tag_name: 'v${{ env.NEW_TAG }}',
+#              target_commitish: 'main',
+#              name: 'v${{ env.NEW_TAG }}',
+#              body: 'Description of the release',
+#              draft: false,
+#              prerelease: false,
+#              generate_release_notes: false
+#            })
+#
