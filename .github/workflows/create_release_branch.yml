@@ -14,17 +14,17 @@ jobs:
 
       - name: Calculate release version
         run: |
-          CUR_TAG=$(git describe --tags | grep -E '^[0-9]+\.[0-9]+.[0-9].+$' && true || echo 0.0.0)
+          CUR_TAG=$(git describe --tags | cut -f 2-99 -dv | grep -E '^[0-9]+\.[0-9]+.[0-9].+$' && true || echo 0.0.0)
           echo Cur TAG [$CUR_TAG][$?]
           if [ "$CUR_TAG" == "0.0.0" ]; then
-            # gctrevino - I don't feel confident that we couldn't find a tag because it's a new repo
+            # gtrevino - I don't feel confident that we couldn't find a tag because it's a new repo
             # so, I will skip the full process in that case.
             NEW_TAG=0.0.1
             # NEW_TAG=$CUR_TAG
           else
-            MAJOR=$(git describe --tags | cut -f 1 -d. | cut -f 1 -d-)
-            MINOR=$(git describe --tags | cut -f 2 -d. | cut -f 1 -d-)
-            PATCH=$(( $(git describe --tags | cut -f 3 -d. | cut -f 1 -d-) + 1 ))
+            MAJOR=$(git describe --tags | cut -f 2-99 -dv | cut -f 1 -d. | cut -f 1 -d-)
+            MINOR=$(git describe --tags | cut -f 2-99 -dv | cut -f 2 -d. | cut -f 1 -d-)
+            PATCH=$(( $(git describe --tags | cut -f 2-99 -dv | cut -f 3 -d. | cut -f 1 -d-) + 1 ))
 
             echo MAJOR = [$MAJOR]
             echo MINOR = [$MINOR]
