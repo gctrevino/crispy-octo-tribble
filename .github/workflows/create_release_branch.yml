@@ -1,9 +1,10 @@
 name: Automatic Release
 
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch:
+  schedule:
+    - cron: '30 5 11 * *'
+    - cron: '30 5 21 * *'
 
 jobs:
   create_release:
