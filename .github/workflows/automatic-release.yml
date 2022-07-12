@@ -2,11 +2,9 @@ name: Automatic Release
 
 on:
   push:
-  workflow_dispatch:
-    inputs:
-      versionName:
-        description: 'Name of version  (ie 1.2.3)'
-        required: true
+    branches:
+      - main
+      - feature/automatic-release
   schedule:
     - cron: '30 5 11 * *'
     - cron: '30 5 21 * *'
@@ -90,6 +88,9 @@ jobs:
             })
 
             console.log(release_branch)
+            console.log("#############################")
+            console.log("#############################")
+            console.log(release_branch.data.object.sha)
 
 #      - name: Create Release
 #        id: create_release
