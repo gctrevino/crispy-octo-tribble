@@ -83,11 +83,11 @@ jobs:
             // Octokit.js
             // https://github.com/octokit/core.js#readme
 
-            repository = ${{ github.repository }}
+            repository = '${{ github.repository }}'
             data=repository.split('/')
             owner=data[0]
             repo=data[1]
-            const url_request='POST /repos/${{ github.repository }}/releases'
+            const url_request='POST /repos/'+owner+'/'+repo+'/releases'
 
             const octokit = new Octokit({
               auth: ${{secrets.TMP_TOKEN}}
