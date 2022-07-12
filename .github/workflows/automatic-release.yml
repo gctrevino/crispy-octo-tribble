@@ -17,6 +17,8 @@ jobs:
     steps:
       - name: Check out code
         uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
 
       - name: Initialize git config
         run: |
@@ -52,7 +54,47 @@ jobs:
         run: |
           echo Look into the repo log to find the relevant information
 
-#      - name: Create Release
-#        id: create_release
+#      - name: Set tag
+#        uses: actions/github-script@v4
+#        with:
+#          github-token: ${{secrets.TMP_TOKEN}}
+#          script: |
+#            annotatedTag = await github.git.createTag({
+#              owner: context.repo.owner,
+#              repo: context.repo.repo,
+#              tag: "${{ env.NEW_TAG }}",
+#              message: "This is a new tag",
+#              object: context.sha,
+#              type: "commit",
+#            })
+#
+#            await github.git.createRef({
+#              owner: context.repo.owner,
+#              repo: context.repo.repo,
+#              ref: "refs/tags/${{ env.NEW_TAG }}",
+#              sha: annotatedTag.data.sha
+#            })
 
+      - name: Create Release
+        id: create_release
+        uses: actions/github-script@v4
+        with:
+          script: |
+            // Octokit.js
+            // https://github.com/octokit/core.js#readme
+            const octokit = new Octokit({
+              auth: ${{secrets.TMP_TOKEN}}
+            })
+
+            await octokit.request('POST /repos/${{ context.repo.owner }}/${{ context.repo.repo }}/releases', {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              tag_name: 'v${{ env.NEW_TAG }}',
+              target_commitish: 'main',
+              name: 'v${{ env.NEW_TAG }}',
+              body: 'Description of the release',
+              draft: false,
+              prerelease: false,
+              generate_release_notes: false
+            })
 
