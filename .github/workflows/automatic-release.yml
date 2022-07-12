@@ -79,25 +79,12 @@ jobs:
         id: create_release
         uses: actions/github-script@v4
         with:
+          github-token: ${{secrets.TMP_TOKEN}}
           script: |
-            // Octokit.js
-            // https://github.com/octokit/core.js#readme
-
-            const { Octokit } = require('@octokit/rest');
-
-            repository = '${{ github.repository }}'
-            data=repository.split('/')
-            owner=data[0]
-            repo=data[1]
-            const url_request='POST /repos/'+owner+'/'+repo+'/releases'
-
-            const octokit = new Octokit({
-              auth: ${{secrets.TMP_TOKEN}}
-            })
-
-            await octokit.request(url_releases, {
-              owner: owner,
-              repo: repo,
+            const url_request='POST /repos/'+context.repo.owner+'/'+context.repo.repo+'/releases'
+            await github.git.request(url_releases, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
               tag_name: 'v${{ env.NEW_TAG }}',
               target_commitish: 'main',
               name: 'v${{ env.NEW_TAG }}',
