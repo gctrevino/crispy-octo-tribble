@@ -2,7 +2,8 @@ name: Publish Release
 
 on:
   push:
-    - 'release/**'
+    branches:
+      - 'releases/**'
 
 jobs:
   publish_release:
