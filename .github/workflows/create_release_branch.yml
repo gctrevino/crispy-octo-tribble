@@ -70,7 +70,7 @@ jobs:
           script: |
             # https://docs.github.com/en/rest/git/refs#create-a-reference
             const url_releases='POST /repos/'+context.repo.owner+'/'+context.repo.repo+'/git/refs'
-            release_branch = await github.request('POST /repos/{owner}/{repo}/git/refs', {
+            release_branch = await github.request(url_releases, {
               owner: context.repo.owner,
               repo: context.repo.repo,
               ref: 'refs/heads/release/${{ env.NEW_TAG }}',
