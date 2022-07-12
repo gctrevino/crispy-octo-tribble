@@ -86,7 +86,7 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               ref: 'refs/heads/release/${{ env.NEW_TAG }}',
-              sha: context.repo.sha
+              sha: context.sha
             })
 
             console.log(release_branch)
