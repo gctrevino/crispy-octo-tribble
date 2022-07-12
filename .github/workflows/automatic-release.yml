@@ -82,7 +82,7 @@ jobs:
           github-token: ${{secrets.TMP_TOKEN}}
           script: |
             const url_releases='POST /repos/'+context.repo.owner+'/'+context.repo.repo+'/releases'
-            await github.git.request(url_releases, {
+            await github.request(url_releases, {
               owner: context.repo.owner,
               repo: context.repo.repo,
               tag_name: 'v${{ env.NEW_TAG }}',
