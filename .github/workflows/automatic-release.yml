@@ -81,7 +81,7 @@ jobs:
         with:
           github-token: ${{secrets.TMP_TOKEN}}
           script: |
-            const url_request='POST /repos/'+context.repo.owner+'/'+context.repo.repo+'/releases'
+            const url_releases='POST /repos/'+context.repo.owner+'/'+context.repo.repo+'/releases'
             await github.git.request(url_releases, {
               owner: context.repo.owner,
               repo: context.repo.repo,
