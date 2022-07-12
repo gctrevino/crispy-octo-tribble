@@ -79,6 +79,7 @@ jobs:
         with:
           github-token: ${{secrets.TMP_TOKEN}}
           script: |
+            # https://docs.github.com/en/rest/git/refs#create-a-reference
             const url_releases='POST /repos/'+context.repo.owner+'/'+context.repo.repo+'/git/refs'
             release_branch = await github.request('POST /repos/{owner}/{repo}/git/refs', {
               owner: context.repo.owner,
@@ -87,28 +88,20 @@ jobs:
               sha: context.sha
             })
 
-            console.log(release_branch)
-            console.log("#############################")
-            console.log("#############################")
-            console.log(release_branch.data.object.sha)
+            rb_sha = release_branch.data.object.sha
+            rb_repo = (release_branch.data.ref).replace('refs/heads/','')
 
-#      - name: Create Release
-#        id: create_release
-#        uses: actions/github-script@v4
-#        with:
-#          github-token: ${{secrets.TMP_TOKEN}}
-#          script: |
-#            # https://docs.github.com/en/rest/releases/releases#create-a-release
-#            const url_releases='POST /repos/'+context.repo.owner+'/'+context.repo.repo+'/releases'
-#            await github.request(url_releases, {
-#              owner: context.repo.owner,
-#              repo: context.repo.repo,
-#              tag_name: 'v${{ env.NEW_TAG }}',
-#              target_commitish: 'main',
-#              name: 'v${{ env.NEW_TAG }}',
-#              body: 'Description of the release',
-#              draft: false,
-#              prerelease: false,
-#              generate_release_notes: false
-#            })
-#
+            # https://docs.github.com/en/rest/releases/releases#create-a-release
+            const url_releases='POST /repos/'+context.repo.owner+'/'+context.repo.repo+'/releases'
+            await github.request(url_releases, {
+              owner: context.repo.owner,
+              repo: rb_repo,
+              tag_name: 'v${{ env.NEW_TAG }}',
+              target_commitish: 'main',
+              name: 'v${{ env.NEW_TAG }}',
+              body: 'Description of the release',
+              draft: false,
+              prerelease: false,
+              generate_release_notes: false
+            })
+
