@@ -69,8 +69,8 @@ jobs:
           github-token: ${{secrets.TMP_TOKEN}}
           script: |
             # https://docs.github.com/en/rest/git/refs#create-a-reference
-            const url_releases='POST /repos/'+context.repo.owner+'/'+context.repo.repo+'/git/refs'
-            console.log('URL ['+url_releases+']')
+            #const url_releases='POST /repos/'+context.repo.owner+'/'+context.repo.repo+'/git/refs'
+            #console.log('URL ['+url_releases+']')
             console.log('owner ['+context.repo.owner+']')
             console.log('repo ['+context.repo.repo+']')
             console.log('ref ['+'refs/heads/release/${{ env.NEW_TAG }}'+']')
