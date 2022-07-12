@@ -1,0 +1,41 @@
+name: Publish Release
+
+on:
+  push:
+    branches:
+      - 'release/**'
+
+jobs:
+  publish_release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Extract release notes
+        id: extract_release_notes
+        run: |
+          echo Gather release notes
+
+      - name: Publish Release
+        id: publish_release_branch
+        uses: actions/github-script@v4
+        with:
+          github-token: ${{secrets.TMP_TOKEN}}
+          script: |
+            // https://docs.github.com/en/rest/releases/releases#create-a-release
+            const url_releases='POST /repos/'+context.repo.owner+'/'+context.repo.repo+'/releases'
+            await github.request(url_releases, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              tag_name: 'v'+context.repo.repo,
+              target_commitish: 'main',
+              name: 'v'+context.repo.repo,
+              body: 'Description of the release',
+              draft: false,
+              prerelease: false,
+              generate_release_notes: false
+            })
+

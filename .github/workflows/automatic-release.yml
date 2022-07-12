@@ -1,0 +1,105 @@
+name: Automatic Release
+
+on:
+  schedule:
+    - cron: '30 5 11 * *'
+    - cron: '30 5 21 * *'
+
+jobs:
+  tag_release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Initialize git config
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email noreply@github.com
+
+      - name: Calculate release version
+        run: |
+          CUR_TAG=$(git describe --tags | cut -f 2-99 -dv | grep -E '^[0-9]+\.[0-9]+.[0-9].+$' && true || echo 0.0.0)
+          echo Cur TAG [$CUR_TAG][$?]
+          if [ "$CUR_TAG" == "0.0.0" ]; then
+            # gtrevino - I don't feel confident that we couldn't find a tag because it's a new repo
+            # so, I will skip the full process in that case.
+            NEW_TAG=0.0.1
+            # NEW_TAG=$CUR_TAG
+          else
+            MAJOR=$(git describe --tags | cut -f 2-99 -dv | cut -f 1 -d. | cut -f 1 -d-)
+            MINOR=$(git describe --tags | cut -f 2-99 -dv | cut -f 2 -d. | cut -f 1 -d-)
+            PATCH=$(( $(git describe --tags | cut -f 2-99 -dv | cut -f 3 -d. | cut -f 1 -d-) + 1 ))
+
+            echo MAJOR = [$MAJOR]
+            echo MINOR = [$MINOR]
+            echo PATCH = [$PATCH]
+
+            NEW_TAG=$MAJOR.$MINOR.$PATCH
+          fi
+          # Passing value of New Tag to Workflow Environment Variables
+          echo "NEW_TAG=$NEW_TAG" >> $GITHUB_ENV
+          echo New TAG [$NEW_TAG][$?]
+
+      - name: Extract release notes
+        id: extract_release_notes
+        run: |
+          echo Look into the repo log to find the relevant information
+
+#      - name: Set tag
+#        uses: actions/github-script@v4
+#        with:
+#          github-token: ${{secrets.TMP_TOKEN}}
+#          script: |
+#            annotatedTag = await github.git.createTag({
+#              owner: context.repo.owner,
+#              repo: context.repo.repo,
+#              tag: "${{ env.NEW_TAG }}",
+#              message: "This is a new tag",
+#              object: context.sha,
+#              type: "commit",
+#            })
+#
+#            await github.git.createRef({
+#              owner: context.repo.owner,
+#              repo: context.repo.repo,
+#              ref: "refs/tags/${{ env.NEW_TAG }}",
+#              sha: annotatedTag.data.sha
+#            })
+
+      - name: Create Release Branch
+        id: create_release_branch
+        uses: actions/github-script@v4
+        with:
+          github-token: ${{secrets.TMP_TOKEN}}
+          script: |
+            # https://docs.github.com/en/rest/git/refs#create-a-reference
+            const url_releases='POST /repos/'+context.repo.owner+'/'+context.repo.repo+'/git/refs'
+            release_branch = await github.request('POST /repos/{owner}/{repo}/git/refs', {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: 'refs/heads/release/${{ env.NEW_TAG }}',
+              sha: context.sha
+            })
+
+            rb_sha = release_branch.data.object.sha
+            rb_repo = (release_branch.data.ref).replace('refs/heads/','')
+
+            console.log('sha ['+rb_sha+'] \n repo ['+rb_repo+']')
+
+            # https://docs.github.com/en/rest/releases/releases#create-a-release
+            const url_releases='POST /repos/'+context.repo.owner+'/'+context.repo.repo+'/releases'
+            await github.request(url_releases, {
+              owner: context.repo.owner,
+              repo: rb_repo,
+              tag_name: 'v${{ env.NEW_TAG }}',
+              target_commitish: 'main',
+              name: 'v${{ env.NEW_TAG }}',
+              body: 'Description of the release',
+              draft: false,
+              prerelease: false,
+              generate_release_notes: false
+            })
+
