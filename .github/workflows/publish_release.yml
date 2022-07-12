@@ -2,13 +2,7 @@ name: Publish Release
 
 on:
   push:
-  workflow_call:
-    inputs:
-      # Image Info
-      DOCKERFILE:
-        required: false
-        type: string
-        default: Dockerfile
+    - 'release/**'
 
 jobs:
   publish_release:
@@ -30,22 +24,17 @@ jobs:
         with:
           github-token: ${{secrets.TMP_TOKEN}}
           script: |
-            console.log('Context')
-            console.log(context)
-            console.log(context.repo)
-            /*
             # https://docs.github.com/en/rest/releases/releases#create-a-release
             const url_releases='POST /repos/'+context.repo.owner+'/'+context.repo.repo+'/releases'
             await github.request(url_releases, {
               owner: context.repo.owner,
               repo: context.repo.repo,
-              tag_name: 'v${{ env.NEW_TAG }}',
+              tag_name: 'v'+context.repo.repo,
               target_commitish: 'main',
-              name: 'v${{ env.NEW_TAG }}',
+              name: 'v'+context.repo.repo,
               body: 'Description of the release',
               draft: false,
               prerelease: false,
               generate_release_notes: false
             })
-            */
 
