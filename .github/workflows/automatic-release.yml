@@ -27,7 +27,7 @@ jobs:
 
       - name: Calculate release version
         run: |
-          CUR_TAG=$(git describe | grep -E '^[0-9]+\.[0-9]+.[0-9].+$' && true || echo 0.0.0)
+          CUR_TAG=$(git describe --tags | grep -E '^[0-9]+\.[0-9]+.[0-9].+$' && true || echo 0.0.0)
           echo Cur TAG [$CUR_TAG][$?]
           if [ "$CUR_TAG" == "0.0.0" ]; then
             # gtrevino - I don't feel confident that we couldn't find a tag because it's a new repo
@@ -35,9 +35,9 @@ jobs:
             NEW_TAG=0.0.1
             # NEW_TAG=$CUR_TAG
           else
-            MAJOR=$(git describe | cut -f 1 -d. | cut -f 1 -d-)
-            MINOR=$(git describe | cut -f 2 -d. | cut -f 1 -d-)
-            PATCH=$(( $(git describe | cut -f 3 -d. | cut -f 1 -d-) + 1 ))
+            MAJOR=$(git describe --tags | cut -f 1 -d. | cut -f 1 -d-)
+            MINOR=$(git describe --tags | cut -f 2 -d. | cut -f 1 -d-)
+            PATCH=$(( $(git describe --tags | cut -f 3 -d. | cut -f 1 -d-) + 1 ))
 
             echo MAJOR = [$MAJOR]
             echo MINOR = [$MINOR]
@@ -81,6 +81,21 @@ jobs:
         with:
           github-token: ${{secrets.TMP_TOKEN}}
           script: |
+            const url_releases='POST /repos/'+context.repo.owner+'/'+context.repo.repo+'/git/refs'
+            await github.request('POST /repos/{owner}/{repo}/git/refs', {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: 'refs/heads/release/${{ env.NEW_TAG }}',
+              sha: context.repo.sha
+            })
+
+      - name: Create Release
+        id: create_release
+        uses: actions/github-script@v4
+        with:
+          github-token: ${{secrets.TMP_TOKEN}}
+          script: |
+            # https://docs.github.com/en/rest/releases/releases#create-a-release
             const url_releases='POST /repos/'+context.repo.owner+'/'+context.repo.repo+'/releases'
             await github.request(url_releases, {
               owner: context.repo.owner,
