@@ -1,0 +1,111 @@
+name: Automatic Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      versionName:
+        description: 'Name of version  (ie 1.2.3)'
+        required: true
+  schedule:
+    - cron: '30 5 11 * *'
+    - cron: '30 5 21 * *'
+
+jobs:
+  tag_release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Initialize git config
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email noreply@github.com
+
+      - name: Calculate release version
+        run: |
+          CUR_TAG=$(git describe | grep -E '^[0-9]+\.[0-9]+.[0-9].+$' && true || echo 0.0.0)
+          echo Cur TAG [$CUR_TAG][$?]
+          if [ "$CUR_TAG" == "0.0.0" ]; then
+            # gtrevino - I don't feel confident that we couldn't find a tag because it's a new repo
+            # so, I will skip the full process in that case.
+            NEW_TAG=0.0.1
+            # NEW_TAG=$CUR_TAG
+          else
+            MAJOR=$(git describe | cut -f 1 -d. | cut -f 1 -d-)
+            MINOR=$(git describe | cut -f 2 -d. | cut -f 1 -d-)
+            PATCH=$(( $(git describe | cut -f 3 -d. | cut -f 1 -d-) + 1 ))
+
+            echo MAJOR = [$MAJOR]
+            echo MINOR = [$MINOR]
+            echo PATCH = [$PATCH]
+
+            NEW_TAG=$MAJOR.$MINOR.$PATCH
+          fi
+          # Passing value of New Tag to Workflow Environment Variables
+          echo "NEW_TAG=$NEW_TAG" >> $GITHUB_ENV
+          echo New TAG [$NEW_TAG][$?]
+
+      - name: Extract release notes
+        id: extract_release_notes
+        run: |
+          echo Look into the repo log to find the relevant information
+
+      - name: Create Release
+        id: create_release
+
+
+#  createrelease:
+#    runs-on: ubuntu-latest
+#    steps:
+#    - name: Check out code
+#      uses: actions/checkout@v2
+#
+#    - name: Create release branch
+#      run: git checkout -b release/v${{ github.event.inputs.versionName }}
+#
+#    - name: Initialize mandatory git config
+#      run: |
+#        git config user.name "GitHub Actions"
+#        git config user.email noreply@github.com
+#
+#    - name: Change version number and name
+#      run: |
+#        printf 'ext.version_code = ${{ github.event.inputs.versionCode }}\next.version_name = "${{ github.event.inputs.versionName }}"\n' > app_versions.gradle
+#
+#    - name: Update Changelog
+#
+#    - name: Commit changelog and manifest files
+#      id: make-commit
+#      run: |
+#        git commit --message "Prepare release ${{ github.event.inputs.versionName }}"
+#        echo "::set-output name=commit::$(git rev-parse HEAD)"
+#
+#    - name: Push new branch
+#      run: |
+#        git push origin release/v${{ github.event.inputs.versionName }}
+#
+#    - name: Create pull request into main
+#      uses: thomaseizinger/create-pull-request@1.0.0
+#      with:
+#       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#       head: release/v${{ github.event.inputs.versionName }}
+#       base: main
+#       title: v${{ github.event.inputs.versionName }} into main
+#       reviewers: ${{ github.event.issue.user.login }}
+#       body: |
+#           Hi!
+#           This PR was created in response workflow running.
+#           I've updated the version name and code commit: ${{ steps.make-commit.outputs.commit }}.
+#
+#    - name: Create pull request to develop
+#      uses: thomaseizinger/create-pull-request@1.0.0
+#      with:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#          head: release/v${{ github.event.inputs.versionName }}
+#          base: develop
+#          title: v${{ github.event.inputs.versionName }} into develop
+#          reviewers: ${{ github.event.issue.user.login }}
+#          body: |
+#              Hi!
+#              This PR was created in response workflow running.
