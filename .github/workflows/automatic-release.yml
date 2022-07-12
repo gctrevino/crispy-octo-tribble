@@ -91,6 +91,8 @@ jobs:
             rb_sha = release_branch.data.object.sha
             rb_repo = (release_branch.data.ref).replace('refs/heads/','')
 
+            console.log('sha ['+rb_sha+'] \n repo ['+rb_repo+']')
+
             # https://docs.github.com/en/rest/releases/releases#create-a-release
             const url_releases='POST /repos/'+context.repo.owner+'/'+context.repo.repo+'/releases'
             await github.request(url_releases, {
