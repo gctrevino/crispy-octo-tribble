@@ -82,13 +82,20 @@ jobs:
           script: |
             // Octokit.js
             // https://github.com/octokit/core.js#readme
+
+            repository = ${{ github.repository }}
+            data=repository.split('/')
+            owner=data[0]
+            repo=data[1]
+            const url_request='POST /repos/${{ github.repository }}/releases'
+
             const octokit = new Octokit({
               auth: ${{secrets.TMP_TOKEN}}
             })
 
-            await octokit.request('POST /repos/${{ context.repo.owner }}/${{ context.repo.repo }}/releases', {
-              owner: context.repo.owner,
-              repo: context.repo.repo,
+            await octokit.request(url_releases, {
+              owner: owner,
+              repo: repo,
               tag_name: 'v${{ env.NEW_TAG }}',
               target_commitish: 'main',
               name: 'v${{ env.NEW_TAG }}',
