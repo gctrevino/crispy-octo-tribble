@@ -1,0 +1,3 @@
+[submodule "content/crispy-octo-tribble-content"]
+	path = content/crispy-octo-tribble-content
+	url = https://github.com/gctrevino/crispy-octo-tribble-content
