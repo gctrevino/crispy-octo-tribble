@@ -32,6 +32,7 @@ jobs:
           script: |
             console.log('Context')
             console.log(context)
+            console.log(context.repo)
             /*
             # https://docs.github.com/en/rest/releases/releases#create-a-release
             const url_releases='POST /repos/'+context.repo.owner+'/'+context.repo.repo+'/releases'
