@@ -26,13 +26,14 @@ jobs:
           github-token: ${{secrets.TMP_TOKEN}}
           script: |
             // https://docs.github.com/en/rest/releases/releases#create-a-release
+            const version = '${{ github.ref }}'.split('/').slice(-1)
             const url_releases='POST /repos/'+context.repo.owner+'/'+context.repo.repo+'/releases'
             await github.request(url_releases, {
               owner: context.repo.owner,
               repo: context.repo.repo,
-              tag_name: 'v'+context.repo.repo,
+              tag_name: 'v'+version,
               target_commitish: 'main',
-              name: 'v'+context.repo.repo,
+              name: 'v'+version,
               body: 'Description of the release',
               draft: false,
               prerelease: false,
