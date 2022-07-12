@@ -68,13 +68,14 @@ jobs:
         with:
           github-token: ${{secrets.TMP_TOKEN}}
           script: |
+            console.log('hellow world')
             # https://docs.github.com/en/rest/git/refs#create-a-reference
             #const url_releases='POST /repos/'+context.repo.owner+'/'+context.repo.repo+'/git/refs'
             #console.log('URL ['+url_releases+']')
-            console.log('owner ['+context.repo.owner+']')
-            console.log('repo ['+context.repo.repo+']')
-            console.log('ref ['+'refs/heads/release/${{ env.NEW_TAG }}'+']')
-            console.log('sha ['+context.sha+']')
+            #console.log('owner ['+context.repo.owner+']')
+            #console.log('repo ['+context.repo.repo+']')
+            #console.log('ref ['+'refs/heads/release/${{ env.NEW_TAG }}'+']')
+            #console.log('sha ['+context.sha+']')
 
             #try {
             #  release_branch = await github.request(url_releases, {
